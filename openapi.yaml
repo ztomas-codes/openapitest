@@ -1,0 +1,386 @@
+openapi: 3.1.0
+info:
+  title: APIFiddle Sample Definition
+  description: Example workspace
+  version: 0.0.0
+paths:
+  /user:
+    post:
+      operationId: createsUserRegister
+      summary: Creates user (register)
+      tags:
+        - user
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: The request was successful, and a new resource was created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/User"
+                required:
+                  - data
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+      parameters: []
+      description: Validates and then creates user, then creates email notify in kafka
+    get:
+      operationId: givesUserDetailBasedOnToken
+      tags:
+        - user
+      summary: Gives user detail based on token
+      responses:
+        "200":
+          description: The request was successful, and the server has returned the
+            requested resource in the response body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Authentication is required to access the requested resource. The
+            client must include the appropriate credentials.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                required:
+                  - message
+        "404":
+          $ref: "#/components/responses/NotFound"
+      parameters: []
+      security:
+        - BearerCustom: []
+  /user/auth:
+    post:
+      operationId: authenticatesAndGivesToken
+      tags:
+        - user
+      summary: Authenticates and gives token
+      responses:
+        "200":
+          description: The request was successful, and the server has returned the
+            requested resource in the response body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                required:
+                  - token
+        "400":
+          $ref: "#/components/responses/Bad Request"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+      parameters: []
+      description: |-
+        Steps:
+        - Looks in **Bloom Filter** for **email**
+        - If needed looks in **Cache**
+        - If needed looks in **database**
+        - Checks if password hashes are same
+        - Gives token
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAuthenticate"
+components:
+  schemas:
+    User:
+      type: object
+      description: A simplified representation of a User, typically used in list views.
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        age:
+          type: number
+        password:
+          type: string
+          description: hash
+        cuRefNo:
+          type: string
+      required:
+        - email
+        - firstName
+        - lastName
+        - age
+        - password
+        - cuRefNo
+    UserSummary:
+      type: object
+      description: A simplified representation of a User, typically used in list view
+      x-fiddle-dto-info:
+        baseSchemaName: User
+      properties: {}
+    UserUpdate:
+      type: object
+      description: Data transfer object for updating all fields of an existing User
+        (PUT operation).
+      x-fiddle-dto-info:
+        baseSchemaName: User
+    UserPartialUpdate:
+      type: object
+      description: Data transfer object for partially updating an existing User (PATCH
+        operation).
+      x-fiddle-dto-info:
+        baseSchemaName: User
+    UserCreate:
+      type: object
+      description: Data transfer object for creating a new User.
+      x-fiddle-dto-info:
+        baseSchemaName: User
+    Article:
+      type: object
+      properties:
+        author:
+          $ref: "#/components/schemas/User"
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+          description: Markdown type content
+      required:
+        - author
+        - slug
+        - title
+        - description
+        - content
+      description: A simplified representation of a Article, typically used in list views.
+    ArticleSummary:
+      type: object
+      properties:
+        author:
+          $ref: "#/components/schemas/User"
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+          description: Markdown type contents
+      required:
+        - author
+        - slug
+        - title
+        - description
+        - content
+      description: A simplifised representation of a Article, typically used in list views.
+      x-fiddle-dto-info:
+        baseSchemaName: Article
+    ArticleUpdate:
+      type: object
+      properties:
+        author_id:
+          type: string
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+      required:
+        - author_id
+        - slug
+        - title
+        - description
+        - content
+      description: Data transfer object for updating all fields of an existing Article
+        (PUT operation).
+      x-fiddle-dto-info:
+        baseSchemaName: Article
+    ArticlePartialUpdate:
+      type: object
+      properties:
+        author_id:
+          type: string
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+      required:
+        - author_id
+        - slug
+        - title
+        - description
+        - content
+      description: Data transfer object for partially updating an existing Article
+        (PATCH operation).
+      x-fiddle-dto-info:
+        baseSchemaName: Article
+    ArticleCreate:
+      type: object
+      properties:
+        author_id:
+          type: string
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+      required:
+        - author_id
+        - slug
+        - title
+        - description
+        - content
+      description: Data transfer object for creating a new Article.
+      x-fiddle-dto-info:
+        baseSchemaName: Article
+    UserAuthenticate:
+      type: object
+      description: ""
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          description: hash
+      required:
+        - email
+        - password
+      x-fiddle-dto-info:
+        baseSchemaName: User
+  parameters: {}
+  responses:
+    Conflict:
+      description: The request could not be completed due to a conflict with the
+        current state of the resource. Resolve the conflict and try again.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+    InternalServerErrror:
+      description: The server encountered an unexpected condition that prevented it
+        from fulfilling the request. Report the issue to the support team if it
+        persists.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+    BadRequest:
+      description: The server could not understand the request due to invalid syntax.
+        The client should modify the request and try again.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                  required:
+                    - message
+            required:
+              - message
+    Ok:
+      description: The request was successful, and the server has returned the
+        requested resource in the response body.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+            required:
+              - data
+    Bad Request:
+      description: The server could not understand the request due to invalid syntax.
+        The client should modify the request and try again.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                  required:
+                    - message
+            required:
+              - message
+    NotFound:
+      description: The server cannot find the requested resource. The endpoint may be
+        invalid or the resource may no longer exist.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+  securitySchemes:
+    BearerCustom:
+      type: http
+      scheme: Bearer
+      bearerFormat: Custom token
+      description: "Authorization: Authenticated requests contain a valid
+        'Authorization's header."
+tags:
+  - name: user
