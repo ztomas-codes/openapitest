@@ -3,6 +3,9 @@ info:
   title: APIFiddle Sample Definition
   description: Example workspace
   version: 0.0.0
+servers:
+  - url: https://www.ahojpyco.cz/
+    description: main server
 paths:
   /user:
     post:
@@ -383,4 +386,5 @@ components:
       description: "Authorization: Authenticated requests contain a valid
         'Authorization's header."
 tags:
-  - name: user
+  - description: Všechny api pro přihlášeného uživatele.
+    name: user
