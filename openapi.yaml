@@ -1,0 +1,346 @@
+openapi: 3.1.0
+info:
+  title: Onyx Klient zona
+  description: Dokumentace api klient zony
+  version: 0.0.0
+servers:
+  - url: https://devel.clientzona.onyx/
+    description: Vývojařský server, pro větev ,,devel''
+paths:
+  /users/{userId}:
+    get:
+      summary: Get user
+      operationId: getUser
+      description: Returns a record of type User.
+      tags:
+        - user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: Požadavek proběhl v pořádku
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+    delete:
+      summary: Delete user
+      operationId: removeUser
+      description: Deletes a record of type User.
+      tags:
+        - user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "204":
+          description: The request was successful, but there is no content to return in
+            the response.
+          content:
+            application/json:
+              schema:
+                type: "null"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+    put:
+      summary: Update user
+      operationId: updateUser
+      description: Updates a record of type User.
+      tags:
+        - user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: Požadavek proběhl v pořádku
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserUpdate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+    patch:
+      summary: Patch user
+      operationId: partialUpdateUser
+      description: Partially updates a record of type User.
+      tags:
+        - user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/userId"
+      responses:
+        "200":
+          description: Požadavek proběhl v pořádku
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPartialUpdate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+  /users:
+    get:
+      summary: List user
+      operationId: listUsers
+      description: Returns a list of User records.
+      tags:
+        - user
+      security: []
+      responses:
+        "200":
+          description: Požadavek proběhl v pořádku
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+    post:
+      summary: Create user
+      operationId: createUser
+      description: Creates a new record of type User.
+      tags:
+        - user
+      security: []
+      responses:
+        "201":
+          description: The request was successful, and a new resource was created.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserCreate"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerErrror"
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        firstName:
+          type: string
+          examples:
+            - John
+        lastName:
+          type: string
+          examples:
+            - Doe
+        email:
+          type: string
+          examples:
+            - example@gmail.com
+        cuRefNo:
+          type: string
+          examples:
+            - 971e0941-02e8-48c7-ae95-2303dda93ac9
+        id:
+          type: number
+      required:
+        - firstName
+        - lastName
+        - email
+        - cuRefNo
+        - id
+      description: |-
+        Authenticated user.. Later can check on with code below:
+        ```js
+        user.has("some.permission")
+        ```
+    UserSummary:
+      type: object
+      properties:
+        firstName:
+          type: string
+          examples:
+            - John
+        lastName:
+          type: string
+          examples:
+            - Doe
+        email:
+          type: string
+          examples:
+            - example@gmail.com
+        cuRefNo:
+          type: string
+          examples:
+            - 971e0941-02e8-48c7-ae95-2303dda93ac9
+        id:
+          type: number
+      required:
+        - firstName
+        - lastName
+        - email
+        - cuRefNo
+        - id
+      description: |-
+        Authenticated user.. Later can check on with code below:
+        ```js
+        user.has("some.permission")
+        ```
+      x-fiddle-dto-info:
+        baseSchemaName: User
+    UserUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        cuRefNo:
+          type: string
+        id:
+          type: number
+      required:
+        - firstName
+        - lastName
+        - email
+        - cuRefNo
+        - id
+      x-fiddle-dto-info:
+        baseSchemaName: User
+    UserCreate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        cuRefNo:
+          type: string
+        id:
+          type: number
+      required:
+        - firstName
+        - lastName
+        - email
+        - cuRefNo
+        - id
+      x-fiddle-dto-info:
+        baseSchemaName: User
+    UserPartialUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        cuRefNo:
+          type: string
+        id:
+          type: number
+      required:
+        - firstName
+        - lastName
+        - email
+        - cuRefNo
+        - id
+      x-fiddle-dto-info:
+        baseSchemaName: User
+  parameters:
+    userId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: number
+  responses:
+    BadRequest:
+      description: The server could not understand the request due to invalid syntax.
+        The client should modify the request and try again.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                  required:
+                    - message
+            required:
+              - message
+    NotFound:
+      description: The server cannot find the requested resource. The endpoint may be
+        invalid or the resource may no longer exist.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+    InternalServerErrror:
+      description: The server encountered an unexpected condition that prevented it
+        from fulfilling the request. Report the issue to the support team if it
+        persists.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+    Conflict:
+      description: The request could not be completed due to a conflict with the
+        current state of the resource. Resolve the conflict and try again.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+tags:
+  - name: user
+    description: ""
